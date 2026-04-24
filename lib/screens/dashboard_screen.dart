@@ -104,7 +104,11 @@ class DashboardScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Welcome back,',
-                style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade500 : Colors.blueGrey.shade400, fontSize: 16)),
+                style: TextStyle(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.grey.shade500
+                        : Colors.blueGrey.shade400,
+                    fontSize: 16)),
             const SizedBox(height: 4),
             Text(
                 settings.sender.businessName.isNotEmpty
@@ -126,7 +130,7 @@ class DashboardScreen extends StatelessWidget {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
+                  color: Colors.black.withOpacity(0.1),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -227,7 +231,11 @@ class DashboardScreen extends StatelessWidget {
                           child: Text(
                               DateFormat('MMM').format(DateTime(2024, month)),
                               style: TextStyle(
-                                  fontSize: 10, color: Theme.of(context).brightness == Brightness.dark ? Colors.grey : Colors.blueGrey.shade400)),
+                                  fontSize: 10,
+                                  color: Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.grey
+                                      : Colors.blueGrey.shade400)),
                         );
                       },
                     ),
@@ -353,7 +361,7 @@ class DashboardScreen extends StatelessWidget {
               physics: const NeverScrollableScrollPhysics(),
               itemCount: recent.length,
               separatorBuilder: (_, __) => Divider(
-                  height: 24, color: Colors.grey.withValues(alpha: 0.1)),
+                  height: 24, color: Colors.grey.withOpacity(0.1)),
               itemBuilder: (context, index) {
                 final invoice = recent[index];
                 final isPaid = invoice.status == InvoiceStatus.paid;
@@ -362,12 +370,12 @@ class DashboardScreen extends StatelessWidget {
                   margin: const EdgeInsets.symmetric(vertical: 6),
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).cardColor.withValues(alpha: 0.5),
+                    color: Theme.of(context).cardColor.withOpacity(0.5),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: isPaid
-                          ? Colors.green.withValues(alpha: 0.1)
-                          : Colors.grey.withValues(alpha: 0.05),
+                          ? Colors.green.withOpacity(0.1)
+                          : Colors.grey.withOpacity(0.05),
                     ),
                   ),
                   child: Row(
@@ -379,7 +387,7 @@ class DashboardScreen extends StatelessWidget {
                           color: Theme.of(context)
                               .colorScheme
                               .primary
-                              .withValues(alpha: 0.1),
+                              .withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Center(
@@ -407,7 +415,11 @@ class DashboardScreen extends StatelessWidget {
                             Text(
                               invoice.invoiceNumber,
                               style: TextStyle(
-                                  color: Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade500 : Colors.blueGrey.shade400, fontSize: 12),
+                                  color: Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.grey.shade500
+                                      : Colors.blueGrey.shade400,
+                                  fontSize: 12),
                             ),
                           ],
                         ),
@@ -444,15 +456,15 @@ class DashboardScreen extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: Colors.green.withValues(alpha: 0.1),
+                              color: Colors.green.withOpacity(0.1),
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: Colors.green.withValues(alpha: 0.3),
+                                color: Colors.green.withOpacity(0.3),
                                 width: 1.5,
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.green.withValues(alpha: 0.1),
+                                  color: Colors.green.withOpacity(0.1),
                                   blurRadius: 8,
                                   spreadRadius: 1,
                                 ),
@@ -497,7 +509,7 @@ class _SummaryContent extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
+              color: Colors.white.withOpacity(0.2),
               borderRadius: BorderRadius.circular(12)),
           child: Icon(icon, color: Colors.white, size: 24),
         ),

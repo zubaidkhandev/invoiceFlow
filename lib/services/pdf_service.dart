@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:invoice_flow/models/invoice.dart';
@@ -91,7 +90,6 @@ class PdfService {
   }
 
   pw.Widget _buildPdfHeader(Invoice invoice, pw.MemoryImage? logoImage) {
-
     return pw.Row(
       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
       crossAxisAlignment: pw.CrossAxisAlignment.start,

@@ -101,13 +101,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     color: Theme.of(context)
                                         .colorScheme
                                         .primary
-                                        .withValues(alpha: 0.1),
+                                        .withOpacity(0.1),
                                     borderRadius: BorderRadius.circular(20),
                                     border: Border.all(
                                         color: Theme.of(context)
                                             .colorScheme
                                             .primary
-                                            .withValues(alpha: 0.2),
+                                            .withOpacity(0.2),
                                         width: 2),
                                     image: _logoData != null
                                         ? DecorationImage(
@@ -140,7 +140,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                             borderRadius:
                                                 BorderRadius.circular(20),
                                             color:
-                                                Colors.black.withValues(alpha: 0.3),
+                                                Colors.black.withOpacity(0.3),
                                           ),
                                           child: const Center(
                                             child: Icon(Icons.edit_outlined,
@@ -350,7 +350,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(icon, size: 22, color: Theme.of(context).colorScheme.primary),

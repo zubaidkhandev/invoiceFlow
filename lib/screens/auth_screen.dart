@@ -33,7 +33,7 @@ class _AuthScreenState extends State<AuthScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.lock_person_outlined, size: 64, color: Color(0xFFFED200)),
+                const AppLogo(size: 80),
                 const SizedBox(height: 24),
                 const Text(
                   'Access Locked',
@@ -61,6 +61,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   label: 'Unlock App',
                   onPressed: _submit,
                   width: double.infinity,
+                  icon: Icons.lock_open,
                 ),
               ],
             ),

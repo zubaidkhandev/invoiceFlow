@@ -1,5 +1,8 @@
 import 'dart:ui';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:invoice_flow/blocs/settings_cubit.dart';
 
 class PremiumCard extends StatelessWidget {
   final Widget child;
@@ -35,18 +38,20 @@ class PremiumCard extends StatelessWidget {
             : null,
         color: gradientColors == null
             ? (isGlass
-                ? (isDark ? Colors.white.withValues(alpha: 0.05) : Colors.white.withValues(alpha: 0.7))
+                ? (isDark
+                    ? Colors.white.withOpacity(0.05)
+                    : Colors.white.withOpacity(0.7))
                 : Theme.of(context).cardColor)
             : null,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08), // Increased for light mode
+            color: Colors.black.withOpacity(isDark ? 0.3 : 0.08),
             blurRadius: 24,
             offset: const Offset(0, 12),
           ),
         ],
         border: Border.all(
-          color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey.shade300, // Darker border
+          color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey.shade300,
           width: 1,
         ),
       ),
@@ -85,7 +90,7 @@ class PremiumButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final primaryColor = Theme.of(context).colorScheme.primary;
     final colors =
-        gradientColors ?? [primaryColor, primaryColor.withValues(alpha: 0.8)];
+        gradientColors ?? [primaryColor, primaryColor.withOpacity(0.8)];
 
     Widget button;
     if (isPrimary) {
@@ -98,7 +103,7 @@ class PremiumButton extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: colors.first.withValues(alpha: 0.3),
+              color: colors.first.withOpacity(0.3),
               blurRadius: 12,
               offset: const Offset(0, 6),
             ),
@@ -107,13 +112,18 @@ class PremiumButton extends StatelessWidget {
         child: ElevatedButton.icon(
           onPressed: onPressed,
           icon: icon != null ? Icon(icon, size: 18) : const SizedBox.shrink(),
-          label: Text(label, style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5)),
+          label: Text(label,
+              style: const TextStyle(
+                  fontWeight: FontWeight.bold, letterSpacing: 0.5)),
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.transparent,
             shadowColor: Colors.transparent,
-            foregroundColor: colors.first.computeLuminance() > 0.5 ? Colors.black : Colors.white,
+            foregroundColor: colors.first.computeLuminance() > 0.5
+                ? Colors.black
+                : Colors.white,
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           ),
         ),
       );
@@ -123,10 +133,12 @@ class PremiumButton extends StatelessWidget {
         child: OutlinedButton.icon(
           onPressed: onPressed,
           icon: icon != null ? Icon(icon, size: 18) : const SizedBox.shrink(),
-          label: Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+          label:
+              Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
           style: OutlinedButton.styleFrom(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             side: BorderSide(color: Colors.grey.shade300),
           ),
         ),
@@ -140,22 +152,22 @@ class PremiumStatusBadge extends StatelessWidget {
   final String status;
   final Color color;
 
-  const PremiumStatusBadge({super.key, required this.status, required this.color});
+  const PremiumStatusBadge(
+      {super.key, required this.status, required this.color});
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    // For light mode, we use a slightly darker version of the color for text if it's too bright
-    final textColor = !isDark && color.computeLuminance() > 0.6 
-        ? Color.lerp(color, Colors.black, 0.4)! 
+    final textColor = !isDark && color.computeLuminance() > 0.6
+        ? Color.lerp(color, Colors.black, 0.4)!
         : color;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: isDark ? 0.1 : 0.15),
+        color: color.withOpacity(isDark ? 0.1 : 0.15),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: color.withValues(alpha: isDark ? 0.2 : 0.3)),
+        border: Border.all(color: color.withOpacity(isDark ? 0.2 : 0.3)),
       ),
       child: Text(
         status.toUpperCase(),
@@ -195,7 +207,7 @@ class PremiumFAB extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFED200).withValues(alpha: 0.4),
+            color: const Color(0xFFFED200).withOpacity(0.4),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -225,6 +237,91 @@ class PremiumFAB extends StatelessWidget {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class AppLogo extends StatelessWidget {
+  final double size;
+  final bool showShadow;
+
+  const AppLogo({
+    super.key,
+    this.size = 64,
+    this.showShadow = true,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<SettingsCubit, SettingsState>(
+      builder: (context, state) {
+        final logoData = state.sender.logoData;
+
+        Widget logoWidget;
+        if (logoData != null && logoData.isNotEmpty) {
+          try {
+            logoWidget = Image.memory(
+              base64Decode(logoData),
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) =>
+                  _buildDefaultLogo(context),
+            );
+          } catch (e) {
+            logoWidget = _buildDefaultLogo(context);
+          }
+        } else {
+          logoWidget = _buildDefaultLogo(context);
+        }
+
+        return Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white.withOpacity(0.05)
+                : Colors.white,
+            borderRadius: BorderRadius.circular(size * 0.2),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+              width: 1,
+            ),
+            boxShadow: showShadow
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ]
+                : null,
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(size * 0.2),
+            child: logoWidget,
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildDefaultLogo(BuildContext context) {
+    return Image.asset(
+      'assets/logo.png',
+      fit: BoxFit.contain,
+      errorBuilder: (context, error, stackTrace) => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const FlutterLogo(size: 24),
+            const SizedBox(height: 4),
+            Icon(
+              Icons.account_balance_wallet_outlined,
+              size: size * 0.3,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ],
         ),
       ),
     );
