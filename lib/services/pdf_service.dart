@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'dart:convert';
+import 'package:flutter/services.dart';
 import 'package:invoice_flow/models/invoice.dart';
 import 'package:invoice_flow/utils/formatters.dart';
 import 'package:pdf/pdf.dart';
@@ -16,6 +17,18 @@ class PdfService {
     final pdf = pw.Document();
     final font = await PdfGoogleFonts.interRegular();
     final boldFont = await PdfGoogleFonts.interBold();
+
+    pw.MemoryImage? logoImage;
+    if (invoice.sender.logoData != null) {
+      try {
+        logoImage = pw.MemoryImage(base64Decode(invoice.sender.logoData!));
+      } catch (e) {}
+    } else {
+      try {
+        final ByteData bytes = await rootBundle.load('assets/logo.png');
+        logoImage = pw.MemoryImage(bytes.buffer.asUint8List());
+      } catch (e) {}
+    }
 
     pdf.addPage(
       pw.MultiPage(
@@ -39,7 +52,7 @@ class PdfService {
                   child: pw.Column(
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: [
-                      _buildPdfHeader(invoice),
+                      _buildPdfHeader(invoice, logoImage),
                       pw.SizedBox(height: 50),
                       _buildAddresses(invoice),
                       pw.SizedBox(height: 50),
@@ -77,13 +90,7 @@ class PdfService {
     return pdf.save();
   }
 
-  pw.Widget _buildPdfHeader(Invoice invoice) {
-    pw.MemoryImage? logoImage;
-    if (invoice.sender.logoData != null) {
-      try {
-        logoImage = pw.MemoryImage(base64Decode(invoice.sender.logoData!));
-      } catch (e) {}
-    }
+  pw.Widget _buildPdfHeader(Invoice invoice, pw.MemoryImage? logoImage) {
 
     return pw.Row(
       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
