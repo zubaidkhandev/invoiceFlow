@@ -100,7 +100,7 @@ class PdfService {
             if (logoImage != null)
               pw.Container(
                 height: 60,
-                margin: const pw.EdgeInsets.only(bottom: 15),
+                margin: const pw.EdgeInsets.only(bottom: 8),
                 child: pw.Image(logoImage),
               ),
             pw.Text(
@@ -183,13 +183,15 @@ class PdfService {
           pw.Text(invoice.client.name,
               style:
                   pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12)),
-          if (invoice.client.email.isNotEmpty)
+          pw.SizedBox(height: 3),
+          if (invoice.client.email.isNotEmpty) ...[
             pw.Text(invoice.client.email,
                 style: const pw.TextStyle(fontSize: 10)),
+            pw.SizedBox(height: 3),
+          ],
           if (invoice.client.address.isNotEmpty)
             pw.Container(
-              width: 200,
-              margin: const pw.EdgeInsets.only(top: 4),
+              width: 180,
               child: pw.Text(invoice.client.address,
                   style: pw.TextStyle(fontSize: 10, color: greyColor)),
             ),
@@ -199,19 +201,26 @@ class PdfService {
             [
               pw.Text(invoice.sender.businessName,
                   style: pw.TextStyle(
-                      fontWeight: pw.FontWeight.bold, fontSize: 10)),
-              if (invoice.sender.email.isNotEmpty)
+                      fontWeight: pw.FontWeight.bold, fontSize: 12),
+                  textAlign: pw.TextAlign.right),
+              pw.SizedBox(height: 3),
+              if (invoice.sender.email.isNotEmpty) ...[
                 pw.Text(invoice.sender.email,
-                    style: const pw.TextStyle(fontSize: 9)),
-              if (invoice.sender.phone.isNotEmpty)
+                    style: const pw.TextStyle(fontSize: 10),
+                    textAlign: pw.TextAlign.right),
+                pw.SizedBox(height: 3),
+              ],
+              if (invoice.sender.phone.isNotEmpty) ...[
                 pw.Text(invoice.sender.phone,
-                    style: const pw.TextStyle(fontSize: 9)),
+                    style: const pw.TextStyle(fontSize: 10),
+                    textAlign: pw.TextAlign.right),
+                pw.SizedBox(height: 3),
+              ],
               if (invoice.sender.address.isNotEmpty)
                 pw.Container(
-                  width: 200,
-                  margin: const pw.EdgeInsets.only(top: 4),
+                  width: 180,
                   child: pw.Text(invoice.sender.address,
-                      style: pw.TextStyle(fontSize: 9, color: greyColor),
+                      style: pw.TextStyle(fontSize: 10, color: greyColor),
                       textAlign: pw.TextAlign.right),
                 ),
             ],
