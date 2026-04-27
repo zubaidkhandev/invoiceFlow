@@ -77,10 +77,10 @@ class Invoice {
         invoiceNumber: json['invoiceNumber'] as String,
         issueDate: DateTime.parse(json['issueDate'] as String),
         dueDate: DateTime.parse(json['dueDate'] as String),
-        sender: SenderInfo.fromJson(json['sender'] as Map<String, dynamic>),
-        client: ClientInfo.fromJson(json['client'] as Map<String, dynamic>),
+        sender: SenderInfo.fromJson(Map<String, dynamic>.from(json['sender'])),
+        client: ClientInfo.fromJson(Map<String, dynamic>.from(json['client'])),
         items: (json['items'] as List)
-            .map((i) => LineItem.fromJson(i as Map<String, dynamic>))
+            .map((i) => LineItem.fromJson(Map<String, dynamic>.from(i)))
             .toList(),
         taxPercentage: (json['taxPercentage'] as num).toDouble(),
         notes: json['notes'] as String? ?? '',

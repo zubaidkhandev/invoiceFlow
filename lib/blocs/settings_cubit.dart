@@ -32,7 +32,7 @@ class SettingsState {
       };
 
   factory SettingsState.fromJson(Map<String, dynamic> json) => SettingsState(
-        sender: SenderInfo.fromJson(json['sender'] as Map<String, dynamic>),
+        sender: SenderInfo.fromJson(Map<String, dynamic>.from(json['sender'])),
         currency: json['currency'] as String? ?? 'USD',
         isDarkMode: json['isDarkMode'] as bool? ?? false,
       );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:invoice_flow/blocs/auth_cubit.dart';
@@ -11,6 +12,7 @@ import 'package:invoice_flow/widgets/app_scaffold.dart';
 import 'package:invoice_flow/screens/auth_screen.dart';
 
 void main() async {
+  usePathUrlStrategy();
   WidgetsFlutterBinding.ensureInitialized();
 
   final storageService = StorageService();

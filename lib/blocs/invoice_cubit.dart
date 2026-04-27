@@ -23,10 +23,16 @@ class InvoiceCubit extends Cubit<InvoiceState> {
 
   Future<void> loadInvoices() async {
     emit(InvoiceLoading());
-    final data = _storageService.getInvoices();
-    final invoices = data.map((e) => Invoice.fromJson(e as Map<String, dynamic>)).toList();
-    invoices.sort((a, b) => b.issueDate.compareTo(a.issueDate));
-    emit(InvoiceLoaded(invoices));
+    try {
+      final data = _storageService.getInvoices();
+      final invoices = data
+          .map((e) => Invoice.fromJson(Map<String, dynamic>.from(e)))
+          .toList();
+      invoices.sort((a, b) => b.issueDate.compareTo(a.issueDate));
+      emit(InvoiceLoaded(invoices));
+    } catch (e) {
+      emit(InvoiceLoaded(const []));
+    }
   }
 
   Future<void> saveInvoice(Invoice invoice) async {

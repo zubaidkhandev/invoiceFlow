@@ -22,7 +22,7 @@ class HistoryCubit extends Cubit<HistoryState> {
   void loadHistory() {
     emit(HistoryLoading());
     final raw = _storageService.getHistory();
-    final items = raw.map((e) => HistoryItem.fromJson(e)).toList();
+    final items = raw.map((e) => HistoryItem.fromJson(Map<String, dynamic>.from(e))).toList();
     items.sort((a, b) => b.timestamp.compareTo(a.timestamp));
     emit(HistoryLoaded(items));
   }

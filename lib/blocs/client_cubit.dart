@@ -23,10 +23,16 @@ class ClientCubit extends Cubit<ClientState> {
 
   Future<void> loadClients() async {
     emit(ClientLoading());
-    final data = _storageService.getClients();
-    final clients = data.map((e) => Client.fromJson(e as Map<String, dynamic>)).toList();
-    clients.sort((a, b) => a.name.compareTo(b.name));
-    emit(ClientLoaded(clients));
+    try {
+      final data = _storageService.getClients();
+      final clients = data
+          .map((e) => Client.fromJson(Map<String, dynamic>.from(e)))
+          .toList();
+      clients.sort((a, b) => a.name.compareTo(b.name));
+      emit(ClientLoaded(clients));
+    } catch (e) {
+      emit(ClientLoaded(const []));
+    }
   }
 
   Future<void> saveClient(Client client) async {
