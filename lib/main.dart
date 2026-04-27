@@ -117,10 +117,10 @@ class InvoiceFlowApp extends StatelessWidget {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
-          side: BorderSide(
-              color: isDark
-                  ? Colors.white.withOpacity(0.05)
-                  : Colors.grey.shade300), // Slightly more visible border
+                side: BorderSide(
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.05)
+                      : Colors.grey.shade300), // Slightly more visible border
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
@@ -132,14 +132,14 @@ class InvoiceFlowApp extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
               color: isDark
-                  ? Colors.white.withOpacity(0.1)
+                  ? Colors.white.withValues(alpha: 0.1)
                   : Colors.grey.shade300),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
               color: isDark
-                  ? Colors.white.withOpacity(0.1)
+                  ? Colors.white.withValues(alpha: 0.1)
                   : Colors.grey.shade300),
         ),
         focusedBorder: OutlineInputBorder(

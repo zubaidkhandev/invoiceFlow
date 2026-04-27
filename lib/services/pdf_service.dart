@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:invoice_flow/models/invoice.dart';
 import 'package:invoice_flow/utils/formatters.dart';
@@ -21,12 +22,16 @@ class PdfService {
     if (invoice.sender.logoData != null) {
       try {
         logoImage = pw.MemoryImage(base64Decode(invoice.sender.logoData!));
-      } catch (e) {}
+      } catch (e) {
+        // Fallback if logo data is invalid
+      }
     } else {
       try {
         final ByteData bytes = await rootBundle.load('assets/logo.png');
         logoImage = pw.MemoryImage(bytes.buffer.asUint8List());
-      } catch (e) {}
+      } catch (e) {
+        // Fallback if asset logo is missing
+      }
     }
 
     pdf.addPage(
@@ -486,7 +491,7 @@ class PdfService {
         name: 'invoice_${invoice.invoiceNumber}.pdf',
       );
     } catch (e) {
-      print('PDF Error: $e');
+      debugPrint('PDF Error: $e');
       rethrow;
     }
   }
