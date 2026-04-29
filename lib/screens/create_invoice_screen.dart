@@ -413,7 +413,8 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
               initialValue: item.unitPrice.toString(),
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
-                  hintText: 'Price', prefixText: currency == 'USD' ? '\$' : ''),
+                  hintText: 'Price',
+                  prefixText: AppFormatters.getCurrencySymbol(currency)),
               onChanged: (v) => setState(() => _items[index] =
                   item.copyWith(unitPrice: double.tryParse(v) ?? 0)),
             ),

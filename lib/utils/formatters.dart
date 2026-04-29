@@ -1,9 +1,24 @@
 import 'package:intl/intl.dart';
 
 class AppFormatters {
+  static String getCurrencySymbol(String currency) {
+    switch (currency) {
+      case 'USD':
+        return '\$';
+      case 'EUR':
+        return '€';
+      case 'GBP':
+        return '£';
+      case 'PKR':
+        return 'Rs.';
+      default:
+        return '\$';
+    }
+  }
+
   static String formatCurrency(double amount, String currency) {
     final format = NumberFormat.currency(
-      symbol: currency == 'USD' ? '\$' : (currency == 'EUR' ? '€' : (currency == 'GBP' ? '£' : '\$')),
+      symbol: getCurrencySymbol(currency),
       decimalDigits: 2,
     );
     return format.format(amount);
