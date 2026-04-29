@@ -29,12 +29,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void initState() {
     super.initState();
     final sender = context.read<SettingsCubit>().state.sender;
-    _nameController = TextEditingController(text: sender.businessName);
     _emailController = TextEditingController(text: sender.email);
     _phoneController = TextEditingController(text: sender.phone);
     _addressController = TextEditingController(text: sender.address);
-    _registrationController =
-        TextEditingController(text: sender.registrationNumber);
     _websiteController = TextEditingController(text: sender.website);
     _logoData = sender.logoData;
   }
@@ -62,11 +59,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   void _saveSettings() {
     final sender = SenderInfo(
-      businessName: _nameController.text,
+      businessName: AppConstants.appName,
       email: _emailController.text,
       phone: _phoneController.text,
       address: _addressController.text,
-      registrationNumber: _registrationController.text,
+      registrationNumber: AppConstants.registrationNumber,
       website: _websiteController.text,
       logoData: _logoData,
     );
@@ -106,13 +103,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     color: Theme.of(context)
                                         .colorScheme
                                         .primary
-                                        .withValues(alpha: 0.1),
+                                        .withOpacity(0.1),
                                     borderRadius: BorderRadius.circular(20),
                                     border: Border.all(
                                         color: Theme.of(context)
                                             .colorScheme
                                             .primary
-                                            .withValues(alpha: 0.2),
+                                            .withOpacity(0.2),
                                         width: 2),
                                     image: _logoData != null
                                         ? DecorationImage(
@@ -145,7 +142,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                             borderRadius:
                                                 BorderRadius.circular(20),
                                             color:
-                                                Colors.black.withValues(alpha: 0.3),
+                                                Colors.black.withOpacity(0.3),
                                           ),
                                           child: const Center(
                                             child: Icon(Icons.edit_outlined,
@@ -175,8 +172,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                           const SizedBox(width: 24),
                           Expanded(
-                              child: _buildTextField('Business / Trader Name',
-                                  _nameController, Icons.business)),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(AppConstants.appName,
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold)),
+                                Text(
+                                    'Registration: ${AppConstants.registrationNumber}',
+                                    style: TextStyle(
+                                        color: Colors.grey.shade500,
+                                        fontSize: 12)),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 20),
@@ -191,9 +201,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   _phoneController, Icons.phone_outlined)),
                         ],
                       ),
-                      const SizedBox(height: 20),
-                      _buildTextField('Company Registration Number',
-                          _registrationController, Icons.app_registration),
+
                       const SizedBox(height: 20),
                       _buildTextField('Business Website / Link',
                           _websiteController, Icons.link_outlined),
@@ -369,7 +377,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(icon, size: 22, color: Theme.of(context).colorScheme.primary),

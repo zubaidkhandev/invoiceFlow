@@ -37,64 +37,67 @@ class PdfService {
 
     pdf.addPage(
       pw.MultiPage(
-        pageFormat: PdfPageFormat.a4,
-        margin: pw.EdgeInsets.zero, // Use zero margin for full-bleed elements
-        theme: pw.ThemeData.withFont(base: font, bold: boldFont),
-        build: (context) => [
-          pw.FullPage(
-            ignoreMargins: true,
-            child: pw.Stack(
-              children: [
-                // Left Accent Bar
-                pw.Positioned(
-                  left: 0,
-                  top: 0,
-                  bottom: 0,
-                  child: pw.Container(width: 15, color: primaryColor),
-                ),
-                // Logo Watermark
-                if (logoImage != null)
-                  pw.Center(
-                    child: pw.Opacity(
-                      opacity: 0.10,
-                      child: pw.Image(logoImage, width: 500),
-                    ),
-                  ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.fromLTRB(50, 60, 40, 60),
-                  child: pw.Column(
-                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+        pageTheme: pw.PageTheme(
+          pageFormat: PdfPageFormat.a4.copyWith(
+            marginBottom: 80,
+            marginTop: 40,
+            marginLeft: 50,
+            marginRight: 40,
+          ),
+          theme: pw.ThemeData.withFont(base: font, bold: boldFont),
+          buildBackground: (context) => logoImage != null
+              ? pw.FullPage(
+                  ignoreMargins: true,
+                  child: pw.Stack(
                     children: [
-                      _buildPdfHeader(invoice, logoImage),
-                      pw.SizedBox(height: 50),
-                      _buildAddresses(invoice),
-                      pw.SizedBox(height: 50),
-                      _buildItemsTable(invoice, currency),
-                      pw.SizedBox(height: 40),
-                      pw.Row(
-                        crossAxisAlignment: pw.CrossAxisAlignment.start,
-                        children: [
-                          pw.Expanded(
-                            flex: 1,
-                            child: invoice.notes.isNotEmpty
-                                ? _buildNotesSection(invoice)
-                                : pw.SizedBox(),
+                      pw.Center(
+                        child: pw.Opacity(
+                          opacity: 0.10,
+                          child: pw.Transform.rotate(
+                            angle: -0.2,
+                            child: pw.Image(logoImage, width: 500),
                           ),
-                          pw.SizedBox(width: 50),
-                          pw.Expanded(
-                            flex: 1,
-                            child: _buildTotalSection(invoice, currency),
-                          ),
-                        ],
+                        ),
                       ),
-                      pw.Spacer(),
-                      _buildPdfFooter(invoice),
+                      if (invoice.status == InvoiceStatus.paid)
+                        _buildPaidStamp(),
                     ],
                   ),
-                ),
-                if (invoice.status == InvoiceStatus.paid) _buildPaidStamp(),
-              ],
-            ),
+                )
+              : pw.SizedBox(),
+        ),
+        header: (context) {
+          return pw.Container(
+            margin: const pw.EdgeInsets.only(
+                top: -40, left: -50, right: -50, bottom: 10),
+            height: 3, // Slightly thicker for a more premium feel
+            width: double.infinity,
+            color: primaryColor,
+          );
+        },
+        footer: (context) => _buildPdfFooter(invoice),
+        build: (context) => [
+          _buildPdfHeader(invoice, logoImage),
+          pw.SizedBox(height: 40),
+          _buildAddresses(invoice),
+          pw.SizedBox(height: 40),
+          _buildItemsTable(invoice, currency),
+          pw.SizedBox(height: 50),
+          pw.Row(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Expanded(
+                flex: 1,
+                child: invoice.notes.isNotEmpty
+                    ? _buildNotesSection(invoice)
+                    : pw.SizedBox(),
+              ),
+              pw.SizedBox(width: 50),
+              pw.Expanded(
+                flex: 1,
+                child: _buildTotalSection(invoice, currency),
+              ),
+            ],
           ),
         ],
       ),
@@ -117,20 +120,21 @@ class PdfService {
                 child: pw.Image(logoImage, height: 85),
               ),
             pw.Text(
-              invoice.sender.businessName.toUpperCase(),
+              AppConstants.appName.toUpperCase(),
               style: pw.TextStyle(
                 fontSize: 22,
                 fontWeight: pw.FontWeight.bold,
-                color: accentColor,
-                letterSpacing: 1.5,
+                color: PdfColors.black,
               ),
             ),
-            if (invoice.sender.registrationNumber.isNotEmpty)
-              pw.Text('REGISTRATION: ${invoice.sender.registrationNumber}',
-                  style: pw.TextStyle(
-                      fontSize: 9,
-                      color: greyColor,
-                      fontWeight: pw.FontWeight.bold)),
+            pw.Text(
+              'REGISTRATION: ${AppConstants.registrationNumber}',
+              style: pw.TextStyle(
+                fontSize: 8,
+                color: PdfColors.grey700,
+                fontWeight: pw.FontWeight.bold,
+              ),
+            ),
           ],
         ),
         pw.Column(
@@ -138,12 +142,15 @@ class PdfService {
           children: [
             pw.Container(
               padding:
-                  const pw.EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-              color: accentColor,
+                  const pw.EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              decoration: pw.BoxDecoration(
+                color: accentColor,
+                borderRadius: const pw.BorderRadius.all(pw.Radius.circular(4)),
+              ),
               child: pw.Text(
                 'INVOICE',
                 style: pw.TextStyle(
-                  fontSize: 24,
+                  fontSize: 26,
                   fontWeight: pw.FontWeight.bold,
                   color: primaryColor,
                   letterSpacing: 2,
@@ -178,7 +185,7 @@ class PdfService {
                   fontSize: 8,
                   fontWeight: pw.FontWeight.bold,
                   color: greyColor)),
-          pw.SizedBox(width: 8),
+          pw.SizedBox(width: 5),
           pw.Text(value,
               style:
                   pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold)),
@@ -212,7 +219,7 @@ class PdfService {
         _buildAddressBox(
             'ISSUED BY',
             [
-              pw.Text(invoice.sender.businessName,
+              pw.Text(AppConstants.appName,
                   style: pw.TextStyle(
                       fontWeight: pw.FontWeight.bold, fontSize: 12),
                   textAlign: pw.TextAlign.right),
@@ -261,32 +268,42 @@ class PdfService {
 
   pw.Widget _buildAddressBox(String title, List<pw.Widget> content,
       {pw.CrossAxisAlignment align = pw.CrossAxisAlignment.start}) {
-    return pw.Column(
-      crossAxisAlignment: align,
-      children: [
-        pw.Container(
-          padding: const pw.EdgeInsets.only(bottom: 4),
-          decoration: pw.BoxDecoration(
-            border:
-                pw.Border(bottom: pw.BorderSide(color: primaryColor, width: 2)),
+    return pw.Container(
+      padding: const pw.EdgeInsets.all(12),
+      decoration: pw.BoxDecoration(
+        color: PdfColor(
+            lightGreyColor.red, lightGreyColor.green, lightGreyColor.blue, 0.2),
+        borderRadius: const pw.BorderRadius.all(pw.Radius.circular(8)),
+        border: pw.Border.all(color: lightGreyColor, width: 0.5),
+      ),
+      child: pw.Column(
+        crossAxisAlignment: align,
+        children: [
+          pw.Container(
+            padding: const pw.EdgeInsets.only(bottom: 6),
+            decoration: pw.BoxDecoration(
+              border: pw.Border(
+                  bottom: pw.BorderSide(color: accentColor, width: 1.5)),
+            ),
+            child: pw.Text(title,
+                style: pw.TextStyle(
+                    fontSize: 9,
+                    fontWeight: pw.FontWeight.bold,
+                    color: accentColor,
+                    letterSpacing: 1.2)),
           ),
-          child: pw.Text(title,
-              style: pw.TextStyle(
-                  fontSize: 9,
-                  fontWeight: pw.FontWeight.bold,
-                  color: accentColor,
-                  letterSpacing: 1)),
-        ),
-        pw.SizedBox(height: 10),
-        ...content,
-      ],
+          pw.SizedBox(height: 12),
+          ...content,
+        ],
+      ),
     );
   }
 
   pw.Widget _buildItemsTable(Invoice invoice, String currency) {
     return pw.Table(
       border: pw.TableBorder(
-        bottom: pw.BorderSide(color: lightGreyColor, width: 0.5),
+        bottom: pw.BorderSide(color: lightGreyColor, width: 1),
+        horizontalInside: pw.BorderSide(color: lightGreyColor, width: 0.5),
       ),
       columnWidths: {
         0: const pw.FlexColumnWidth(4),
@@ -329,13 +346,13 @@ class PdfService {
   pw.Widget _tableHeader(String text,
       [pw.Alignment align = pw.Alignment.center]) {
     return pw.Padding(
-      padding: const pw.EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+      padding: const pw.EdgeInsets.symmetric(vertical: 12, horizontal: 12),
       child: pw.Align(
         alignment: align,
         child: pw.Text(
           text,
           style: pw.TextStyle(
-              fontSize: 9,
+              fontSize: 10,
               fontWeight: pw.FontWeight.bold,
               color: accentColor,
               letterSpacing: 0.5),
@@ -347,7 +364,7 @@ class PdfService {
   pw.Widget _tableCell(String text,
       {pw.Alignment align = pw.Alignment.center, bool isBold = false}) {
     return pw.Padding(
-      padding: const pw.EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+      padding: const pw.EdgeInsets.symmetric(vertical: 10, horizontal: 12),
       child: pw.Align(
         alignment: align,
         child: pw.Text(
@@ -365,16 +382,37 @@ class PdfService {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.end,
       children: [
+        pw.Container(
+          padding: const pw.EdgeInsets.only(bottom: 8),
+          margin: const pw.EdgeInsets.only(bottom: 15),
+          decoration: pw.BoxDecoration(
+            border: pw.Border(
+                bottom: pw.BorderSide(color: lightGreyColor, width: 1)),
+          ),
+          child: pw.Text('PAYMENT SUMMARY',
+              style: pw.TextStyle(
+                  fontSize: 9,
+                  fontWeight: pw.FontWeight.bold,
+                  color: accentColor,
+                  letterSpacing: 1)),
+        ),
         _buildTotalRow('SUBTOTAL',
             AppFormatters.formatCurrency(invoice.subtotal, currency)),
         _buildTotalRow('TAX (${invoice.taxPercentage}%)',
             AppFormatters.formatCurrency(invoice.taxAmount, currency)),
         pw.SizedBox(height: 15),
         pw.Container(
-          padding: const pw.EdgeInsets.all(15),
+          padding: const pw.EdgeInsets.all(20),
           decoration: pw.BoxDecoration(
             color: accentColor,
-            borderRadius: pw.BorderRadius.circular(2),
+            borderRadius: const pw.BorderRadius.all(pw.Radius.circular(6)),
+            boxShadow: const [
+              pw.BoxShadow(
+                color: PdfColors.grey300,
+                offset: PdfPoint(0, 2),
+                blurRadius: 4,
+              ),
+            ],
           ),
           child: pw.Row(
             mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
@@ -383,11 +421,12 @@ class PdfService {
                   style: pw.TextStyle(
                       fontWeight: pw.FontWeight.bold,
                       fontSize: 12,
-                      color: primaryColor)),
+                      color: primaryColor,
+                      letterSpacing: 1)),
               pw.Text(AppFormatters.formatCurrency(invoice.total, currency),
                   style: pw.TextStyle(
                       fontWeight: pw.FontWeight.bold,
-                      fontSize: 18,
+                      fontSize: 20,
                       color: primaryColor)),
             ],
           ),
@@ -398,7 +437,7 @@ class PdfService {
 
   pw.Widget _buildTotalRow(String label, String value) {
     return pw.Padding(
-      padding: const pw.EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+      padding: const pw.EdgeInsets.symmetric(vertical: 8, horizontal: 10),
       child: pw.Row(
         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
         children: [
@@ -422,42 +461,51 @@ class PdfService {
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
         pw.Container(
-          padding: const pw.EdgeInsets.only(bottom: 4),
+          padding: const pw.EdgeInsets.only(bottom: 6),
           decoration: pw.BoxDecoration(
             border: pw.Border(
-                bottom: pw.BorderSide(color: lightGreyColor, width: 1)),
+                bottom: pw.BorderSide(color: lightGreyColor, width: 1.5)),
           ),
           child: pw.Text('NOTES & TERMS',
               style: pw.TextStyle(
                   fontSize: 9,
                   fontWeight: pw.FontWeight.bold,
                   color: accentColor,
-                  letterSpacing: 1)),
+                  letterSpacing: 1.2)),
         ),
-        pw.SizedBox(height: 10),
+        pw.SizedBox(height: 15),
         pw.Text(invoice.notes,
-            style: pw.TextStyle(fontSize: 9, color: greyColor, height: 1.5)),
+            style: pw.TextStyle(fontSize: 9, color: greyColor, height: 1.6)),
       ],
     );
   }
 
   pw.Widget _buildPdfFooter(Invoice invoice) {
     return pw.Column(
+      mainAxisSize: pw.MainAxisSize.min,
       children: [
-        pw.Divider(color: lightGreyColor),
-        pw.SizedBox(height: 15),
+        pw.Divider(color: lightGreyColor, thickness: 0.5),
+        pw.SizedBox(height: 20),
         pw.Row(
           mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
             pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
+                pw.Text('PAYMENT TERMS',
+                    style: pw.TextStyle(
+                        fontSize: 7,
+                        fontWeight: pw.FontWeight.bold,
+                        color: greyColor,
+                        letterSpacing: 0.5)),
+                pw.SizedBox(height: 4),
                 pw.Text(
                     'Payment is due within ${invoice.dueDate.difference(invoice.issueDate).inDays} days.',
                     style: pw.TextStyle(fontSize: 8, color: greyColor)),
                 pw.SizedBox(height: 2),
                 pw.Text(
-                    'Please include invoice number #${invoice.invoiceNumber} in your payment reference.',
+                    'Please include invoice number #${invoice.invoiceNumber} in your reference.',
                     style: pw.TextStyle(fontSize: 8, color: greyColor)),
               ],
             ),
@@ -466,20 +514,32 @@ class PdfService {
               children: [
                 pw.Text('THANK YOU FOR YOUR BUSINESS',
                     style: pw.TextStyle(
-                        fontSize: 10,
+                        fontSize: 9,
                         fontWeight: pw.FontWeight.bold,
-                        color: accentColor)),
-                pw.SizedBox(height: 4),
+                        color: accentColor,
+                        letterSpacing: 0.5)),
+                pw.SizedBox(height: 6),
                 pw.UrlLink(
                   destination: AppConstants.appWebsite,
                   child: pw.Text(
-                    'Generated by ClenchX - ${AppConstants.appWebsite.replaceAll('https://', '').replaceAll('/', '')}',
+                    AppConstants.appWebsite
+                        .replaceAll('https://', '')
+                        .replaceAll('/', ''),
                     style: pw.TextStyle(
                       fontSize: 8,
-                      color: PdfColors.grey500,
-                      fontStyle: pw.FontStyle.italic,
+                      color: PdfColors.blue700,
+                      fontWeight: pw.FontWeight.bold,
                       decoration: pw.TextDecoration.underline,
                     ),
+                  ),
+                ),
+                pw.SizedBox(height: 2),
+                pw.Text(
+                  'Professional Invoice Generated by ClenchX',
+                  style: pw.TextStyle(
+                    fontSize: 7,
+                    color: PdfColors.grey400,
+                    fontStyle: pw.FontStyle.italic,
                   ),
                 ),
               ],

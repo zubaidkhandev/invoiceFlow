@@ -17,11 +17,8 @@ class AppFormatters {
   }
 
   static String formatCurrency(double amount, String currency) {
-    final format = NumberFormat.currency(
-      symbol: getCurrencySymbol(currency),
-      decimalDigits: 2,
-    );
-    return format.format(amount);
+    final format = NumberFormat('#,###');
+    return '${getCurrencySymbol(currency)}${format.format(amount)}';
   }
 
   static String formatDate(DateTime date) {

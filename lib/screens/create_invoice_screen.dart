@@ -35,6 +35,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
   final _clientAddressController = TextEditingController();
   final _notesController = TextEditingController();
   final _taxController = TextEditingController(text: '0');
+  bool _isGeneratingPdf = false;
   @override
   void initState() {
     super.initState();
@@ -128,18 +129,33 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
     final currency = context.watch<SettingsCubit>().state.currency;
 
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text(widget.invoice == null ? 'Draft Invoice' : 'Edit Invoice'),
+        elevation: 0,
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+        foregroundColor: Theme.of(context).appBarTheme.foregroundColor,
+        title: Text(widget.invoice == null ? 'Draft Invoice' : 'Edit Invoice',
+            style: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: -0.5)),
         actions: [
-          PremiumButton(
-            label: 'Generate PDF',
-            icon: Icons.picture_as_pdf,
-            onPressed: () {
-              if (_formKey.currentState!.validate()) {
-                PdfService().downloadPdf(
-                    _getCurrentInvoice(InvoiceStatus.draft), currency);
-              }
-            },
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: PremiumButton(
+              label: 'Generate PDF',
+              icon: Icons.picture_as_pdf,
+              isLoading: _isGeneratingPdf,
+              gradientColors: const [Color(0xFFFED200), Color(0xFFD97706)],
+              onPressed: () async {
+                if (_formKey.currentState!.validate()) {
+                  setState(() => _isGeneratingPdf = true);
+                  try {
+                    await PdfService().downloadPdf(
+                        _getCurrentInvoice(InvoiceStatus.draft), currency);
+                  } finally {
+                    if (mounted) setState(() => _isGeneratingPdf = false);
+                  }
+                }
+              },
+            ),
           ),
           const SizedBox(width: 16),
         ],
@@ -256,12 +272,15 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
       ],
     );
   }
-
   Widget _buildSidebar(String currency) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Column(
       children: [
         PremiumCard(
-          gradientColors: const [Color(0xFF030404), Color(0xFF1E293B)],
+          gradientColors: isDark 
+            ? const [Color(0xFF030404), Color(0xFF1E293B)]
+            : const [Color(0xFFFED200), Color(0xFFFFA000)], // Yellow gradient for light mode
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -273,21 +292,21 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
               const SizedBox(height: 24),
               _buildSummaryRow(
                   'Subtotal', AppFormatters.formatCurrency(_subtotal, currency),
-                  isDark: true),
+                  isDark: isDark),
               const SizedBox(height: 12),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Tax (%)',
-                      style: TextStyle(color: Colors.white70)),
+                  Text('Tax (%)',
+                      style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
                   SizedBox(
                     width: 60,
                     child: TextField(
                       controller: _taxController,
                       keyboardType: TextInputType.number,
                       textAlign: TextAlign.end,
-                      style: const TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          color: isDark ? Colors.white : Colors.black, fontWeight: FontWeight.bold),
                       decoration: const InputDecoration(
                           isDense: true,
                           border: InputBorder.none,
@@ -303,7 +322,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                   child: Divider(color: Colors.white12)),
               _buildSummaryRow('Total Amount',
                   AppFormatters.formatCurrency(_total, currency),
-                  isDark: true, isTotal: true),
+                  isDark: isDark, isTotal: true),
             ],
           ),
         ),
@@ -380,51 +399,108 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
   }
 
   Widget _buildItemRow(int index, String currency) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final item = _items[index];
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          Container(
+            width: 32,
+            height: 32,
+            decoration: const BoxDecoration(
+              color: Color(0xFF030404),
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: Text('${index + 1}',
+                  style: const TextStyle(
+                      color: Color(0xFFFED200),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12)),
+            ),
+          ),
+          const SizedBox(width: 16),
           Expanded(
-            flex: 3,
+            flex: 4,
             child: TextFormField(
               initialValue: item.description,
-              decoration: const InputDecoration(hintText: 'Item Description'),
+              decoration: InputDecoration(
+                hintText: 'Item Description',
+                filled: true,
+                fillColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+              ),
               onChanged: (v) => _items[index] = item.copyWith(description: v),
               validator: (v) => v?.isEmpty ?? true ? 'Required' : null,
             ),
           ),
           const SizedBox(width: 12),
           SizedBox(
-            width: 80,
+            width: 70,
             child: TextFormField(
               initialValue: item.quantity.toString(),
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(hintText: 'Qty'),
+              textAlign: TextAlign.center,
+              decoration: InputDecoration(
+                hintText: 'Qty',
+                filled: true,
+                fillColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+              ),
               onChanged: (v) => setState(() => _items[index] =
                   item.copyWith(quantity: double.tryParse(v) ?? 1)),
             ),
           ),
           const SizedBox(width: 12),
           Expanded(
-            flex: 1,
+            flex: 2,
             child: TextFormField(
               initialValue: item.unitPrice.toString(),
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
-                  hintText: 'Price',
-                  prefixText: AppFormatters.getCurrencySymbol(currency)),
+                hintText: 'Price',
+                prefixText: AppFormatters.getCurrencySymbol(currency),
+                filled: true,
+                fillColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+              ),
               onChanged: (v) => setState(() => _items[index] =
                   item.copyWith(unitPrice: double.tryParse(v) ?? 0)),
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 8),
           if (_items.length > 1)
             IconButton(
-              icon: const Icon(Icons.remove_circle_outline,
-                  color: Colors.redAccent),
+              icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
               onPressed: () => _removeItem(index),
+              style: IconButton.styleFrom(
+                backgroundColor: Colors.redAccent.withOpacity(0.1),
+                padding: const EdgeInsets.all(8),
+              ),
             ),
         ],
       ),
