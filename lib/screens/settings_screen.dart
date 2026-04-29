@@ -7,6 +7,7 @@ import 'package:invoice_flow/blocs/settings_cubit.dart';
 import 'package:invoice_flow/models/sender_info.dart';
 import 'package:invoice_flow/utils/constants.dart';
 import 'package:invoice_flow/widgets/premium_widgets.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -21,6 +22,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   late TextEditingController _phoneController;
   late TextEditingController _addressController;
   late TextEditingController _registrationController;
+  late TextEditingController _websiteController;
   String? _logoData;
 
   @override
@@ -33,6 +35,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _addressController = TextEditingController(text: sender.address);
     _registrationController =
         TextEditingController(text: sender.registrationNumber);
+    _websiteController = TextEditingController(text: sender.website);
     _logoData = sender.logoData;
   }
 
@@ -53,6 +56,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _phoneController.dispose();
     _addressController.dispose();
     _registrationController.dispose();
+    _websiteController.dispose();
     super.dispose();
   }
 
@@ -63,6 +67,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       phone: _phoneController.text,
       address: _addressController.text,
       registrationNumber: _registrationController.text,
+      website: _websiteController.text,
       logoData: _logoData,
     );
     context.read<SettingsCubit>().updateSender(sender);
@@ -190,6 +195,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       _buildTextField('Company Registration Number',
                           _registrationController, Icons.app_registration),
                       const SizedBox(height: 20),
+                      _buildTextField('Business Website / Link',
+                          _websiteController, Icons.link_outlined),
+                      const SizedBox(height: 20),
                       _buildTextField('Physical Address', _addressController,
                           Icons.location_on_outlined,
                           maxLines: 3),
@@ -277,6 +285,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onPressed: _saveSettings,
                   width: double.infinity,
                   icon: Icons.save_outlined,
+                ),
+                const SizedBox(height: 32),
+                Center(
+                  child: TextButton.icon(
+                    onPressed: () => launchUrl(Uri.parse(AppConstants.appWebsite)),
+                    icon: const Icon(Icons.language, size: 16),
+                    label: Text(
+                      'Official Website: ${AppConstants.appWebsite.replaceAll('https://', '').replaceAll('/', '')}',
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 100),
               ],

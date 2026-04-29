@@ -4,6 +4,7 @@ class SenderInfo {
   final String address;
   final String phone;
   final String registrationNumber;
+  final String website;
   final String? logoData; // Base64 encoded image string
 
   const SenderInfo({
@@ -12,6 +13,7 @@ class SenderInfo {
     this.address = '',
     this.phone = '',
     this.registrationNumber = '',
+    this.website = '',
     this.logoData,
   });
 
@@ -21,6 +23,7 @@ class SenderInfo {
     String? address,
     String? phone,
     String? registrationNumber,
+    String? website,
     String? logoData,
   }) {
     return SenderInfo(
@@ -29,6 +32,7 @@ class SenderInfo {
       address: address ?? this.address,
       phone: phone ?? this.phone,
       registrationNumber: registrationNumber ?? this.registrationNumber,
+      website: website ?? this.website,
       logoData: logoData ?? this.logoData,
     );
   }
@@ -39,6 +43,7 @@ class SenderInfo {
         'address': address,
         'phone': phone,
         'registrationNumber': registrationNumber,
+        'website': website,
         'logoData': logoData,
       };
 
@@ -48,6 +53,7 @@ class SenderInfo {
         address: json['address'] as String? ?? '',
         phone: json['phone'] as String? ?? '',
         registrationNumber: json['registrationNumber'] as String? ?? '',
+        website: json['website'] as String? ?? '',
         logoData: json['logoData'] as String?,
       );
 
@@ -57,5 +63,6 @@ class SenderInfo {
       address.isEmpty &&
       phone.isEmpty &&
       registrationNumber.isEmpty &&
+      website.isEmpty &&
       logoData == null;
 }
