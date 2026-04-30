@@ -39,19 +39,19 @@ class PremiumCard extends StatelessWidget {
         color: gradientColors == null
             ? (isGlass
                 ? (isDark
-                    ? Colors.white.withOpacity(0.05)
-                    : Colors.white.withOpacity(0.7))
+                    ? Colors.white.withValues(alpha: 0.05)
+                    : Colors.white.withValues(alpha: 0.7))
                 : Theme.of(context).cardColor)
             : null,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.3 : 0.08),
+            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
             blurRadius: 24,
             offset: const Offset(0, 12),
           ),
         ],
         border: Border.all(
-          color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey.shade300,
+          color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey.shade300,
           width: 1,
         ),
       ),
@@ -92,7 +92,7 @@ class PremiumButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final primaryColor = Theme.of(context).colorScheme.primary;
     final colors =
-        gradientColors ?? [primaryColor, primaryColor.withOpacity(0.8)];
+        gradientColors ?? [primaryColor, primaryColor.withValues(alpha: 0.8)];
 
     Widget button;
     if (isPrimary) {
@@ -105,7 +105,7 @@ class PremiumButton extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: colors.first.withOpacity(0.3),
+              color: colors.first.withValues(alpha: 0.3),
               blurRadius: 12,
               offset: const Offset(0, 6),
             ),
@@ -203,9 +203,9 @@ class PremiumStatusBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(isDark ? 0.1 : 0.15),
+        color: color.withValues(alpha: isDark ? 0.1 : 0.15),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: color.withOpacity(isDark ? 0.2 : 0.3)),
+        border: Border.all(color: color.withValues(alpha: isDark ? 0.2 : 0.3)),
       ),
       child: Text(
         status.toUpperCase(),
@@ -245,7 +245,7 @@ class PremiumFAB extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFED200).withOpacity(0.4),
+            color: const Color(0xFFFED200).withValues(alpha: 0.4),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -318,17 +318,17 @@ class AppLogo extends StatelessWidget {
           height: size,
           decoration: BoxDecoration(
             color: Theme.of(context).brightness == Brightness.dark
-                ? Colors.white.withOpacity(0.05)
+                ? Colors.white.withValues(alpha: 0.05)
                 : Colors.white,
             borderRadius: BorderRadius.circular(size * 0.2),
             border: Border.all(
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
               width: 1,
             ),
             boxShadow: showShadow
                 ? [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withValues(alpha: 0.1),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),

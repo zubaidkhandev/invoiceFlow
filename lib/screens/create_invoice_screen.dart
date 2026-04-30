@@ -407,10 +407,10 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1E293B) : Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey.shade200),
+        border: Border.all(color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey.shade200),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -498,7 +498,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
               icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
               onPressed: () => _removeItem(index),
               style: IconButton.styleFrom(
-                backgroundColor: Colors.redAccent.withOpacity(0.1),
+                backgroundColor: Colors.redAccent.withValues(alpha: 0.1),
                 padding: const EdgeInsets.all(8),
               ),
             ),
